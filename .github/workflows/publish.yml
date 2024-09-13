@@ -11,29 +11,36 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout the repository
-      uses: actions/checkout@v3
+      - name: Checkout the repository
+        uses: actions/checkout@v3
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.x'  # Use the Python version your package requires
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'  # Use the Python version your package requires
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install setuptools wheel twine
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install setuptools wheel twine
 
-    - name: Build the package
-      run: |
-        python setup.py sdist bdist_wheel
+      - name: Build the package
+        run: |
+          python setup.py sdist bdist_wheel
 
-    - name: Publish package to GitHub Packages
-      env:
-        TWINE_USERNAME: ${{ github.actor }}  # Use GitHub username
-        TWINE_PASSWORD: ${{ secrets.GITHUB_TOKEN }}  # Use GitHub Actions' GITHUB_TOKEN
-      run: |
-        python -m twine upload --repository https://github.com/${{ github.repository }}/pypi dist/*      
-    - name: Clean up build artifacts
-      run: |
-        rm -rf dist build *.egg-info
+      - name: Publish package to GitHub Packages (using environment variables)
+        env:
+          TWINE_USERNAME: ${{ github.actor }}  # Not recommended for security
+          TWINE_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          twine upload --repository https://github.com/${{ github.repository }}/pypi dist/*
+
+      # Alternative step using a .pypirc file (ensure correct permissions)
+      - name: Publish package to GitHub Packages (using .pypirc)
+        # ... (add steps to create/configure .pypirc securely)
+        run: |
+          twine upload --repository pypi dist/*  # Might not be reliable
+
+      - name: Clean up build artifacts
+        run: |
+          rm -rf dist build *.egg-info
