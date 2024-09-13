@@ -28,12 +28,13 @@ jobs:
         run: |
           python setup.py sdist bdist_wheel
 
-      - name: Publish package to GitHub Packages (using environment variables)
-        env:
-          TWINE_USERNAME: ${{ github.actor }}  # Not recommended for security
-          TWINE_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          twine upload --repository https://github.com/${{ github.repository }}/pypi dist/*
+    - name: Publish package to Azure Artifacts
+      env:
+        TWINE_USERNAME: __token__  # Azure requires "__token__" for authentication via PAT
+        TWINE_PASSWORD: ${{ secrets.AZURE_ARTIFACTS_PAT }}  # Your Azure PAT stored in GitHub secrets
+      run: |
+        python -m twine upload --repository-url ${{ secrets.AZURE_FEED_URL }} dist/*
+        
       - name: Clean up build artifacts
         run: |
           rm -rf dist build *.egg-info
