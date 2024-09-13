@@ -34,13 +34,6 @@ jobs:
           TWINE_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
         run: |
           twine upload --repository https://github.com/${{ github.repository }}/pypi dist/*
-
-      # Alternative step using a .pypirc file (ensure correct permissions)
-      - name: Publish package to GitHub Packages (using .pypirc)
-        # ... (add steps to create/configure .pypirc securely)
-        run: |
-          twine upload --repository pypi dist/*  # Might not be reliable
-
       - name: Clean up build artifacts
         run: |
           rm -rf dist build *.egg-info
